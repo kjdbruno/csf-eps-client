@@ -1,0 +1,99 @@
+// app global css in SCSS form
+@font-face {
+  font-family: Comfortaa;
+  src: url(./font/Comfortaa-Regular.ttf);
+}
+@font-face {
+  font-family: Cream;
+  src: url(./font/cream.ttf);
+}
+* {
+  font-family: 'Comfortaa';
+  letter-spacing: .3mm;
+}
+
+.title
+{
+  font-family: 'Cream';
+}
+
+.header-primary-light
+{
+  background-color: #999999;
+  color: #ffffff;
+}
+.header-primary-dark
+{
+  background-color: #333333;
+  color: #ffffff;
+}
+
+// .drawer-primary-light
+// {
+//   background-color: rgba(29, 29, 29, 0.8);
+//   color: #ffffff;
+// }
+// .drawer-primary-dark
+// {
+//   background-color: rgba(0, 0, 0, 0.9);
+//   color: #ffffff;
+// }
+
+//error
+.div-error
+{
+  background: rgba($color: #C10015, $alpha: 0.1);
+  border: 1px solid #ff99a5;
+  border-radius: 5px;
+}
+
+.card-border-active{
+  border: 1px #C8E6C9 solid;
+}
+
+.card-border-light{
+  border: 1px #ffffff solid;
+}
+
+.card-border-dark{
+  border: 1px #1D1D1D solid;
+}
+
+.bg-color-dark 
+{
+  background-color: #212121;
+}
+
+.bg-color-light
+{
+  background-color: #f6f9fc;
+}
+
+.my-table-details {
+  max-width: 500px;
+  white-space: normal;
+}
+
+.btn-form
+{
+  width: 120px;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
