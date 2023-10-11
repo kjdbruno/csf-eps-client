@@ -260,15 +260,13 @@ const createPreference = async () => {
     preferenceDialog.value = false
 
   } catch (error) {
-    /**
-     * display error
-     */
-    err.value = error.response.data.errors
-    hasError.value = true
-    /**
-     * disable inner loading
-     */
-     innerLoading.value = false
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      err.value = error.response.data.errors
+      hasError.value = true
+    }
+    innerLoading.value = false
   }
 
 }
@@ -354,15 +352,13 @@ const updatePreference = async () => {
     preferenceDialog.value = false
 
   } catch (error) {
-    /**
-     * display error
-     */
-    err.value = error.response.data.errors
-    hasError.value = true
-    /**
-     * disable inner loading
-     */
-     innerLoading.value = false
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      err.value = error.response.data.errors
+      hasError.value = true
+    }
+    innerLoading.value = false
   }
 }
 
@@ -435,9 +431,9 @@ const createDisable = async () => {
      */
     id.value = ''
   } catch (error) {
-    /**
-     * disable loading
-     */
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     $q.loading.hide()
   }
 }
@@ -511,9 +507,9 @@ const createEnable = async () => {
      */
     id.value = ''
   } catch (error) {
-    /**
-     * disable loading
-     */
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     $q.loading.hide()
   }
 }
@@ -562,7 +558,7 @@ const getAllPreference = async () => {
   } catch (error) {
     tableLoading.value = false
     if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
-      authStore.auth = true
+      authStore.notAuthenticated = true
     }
   }
 }
@@ -578,6 +574,9 @@ const searchList = debounce(async (val) => {
     lists.value = res.data
     tableLoading.value = false
   } catch (error) {
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     tableLoading.value = false
   }
 })

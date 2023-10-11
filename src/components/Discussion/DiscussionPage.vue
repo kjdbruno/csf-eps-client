@@ -130,6 +130,9 @@
                       <q-btn v-if="props.row.isActive==true" unelevated size="sm" round :color="$q.dark.isActive ? 'grey-9' : 'grey-2'" text-color="grey" icon="more_vert">
                         <q-menu cover auto-close>
                           <q-list>
+                            <q-item dense clickable @click="print(props.row.id)">
+                              <q-item-section>Print</q-item-section>
+                            </q-item>
                             <q-item dense clickable @click="thread(props.row.id)">
                               <q-item-section>Thread</q-item-section>
                             </q-item>
@@ -232,6 +235,16 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="reportDialog" full-height full-width>
+      <q-card>
+        <q-btn icon="close" class="fixed bg-white" round dense v-close-popup style="top: 25px; right: 10px; transform: translateY(-50%); z-index: 999;" />
+        <q-card-section class="q-pa-none">
+          <div v-if="file" class="myIframe"> 
+            <iframe :src="file" height="100%" width="100%"></iframe>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -285,6 +298,9 @@ const photo = ref('')
 
 const filter = ref('')
 
+const file = ref('')
+const reportDialog = ref(false)
+
 const errors = reactive({
   title: {msg: null, type: null},
   content: {msg: null, type: null},
@@ -292,6 +308,7 @@ const errors = reactive({
   day: {msg: null, type: null},
   photo: {msg: null, type: null}
 })
+
 
 const validation = () => {
   let isError = false
@@ -674,7 +691,7 @@ const createEnable = async () => {
  * thread
  */
 const thread = (data) => {
-  navStore.discussionId = data
+  navStore.discussionID = data
   navStore.currentPage = 'DiscussionDetailPage'
 }
 
@@ -787,6 +804,35 @@ const searchList = debounce(async (val) => {
 })
 // watch search text
 watch(() => filter.value, searchList)
+
+/**
+ * generate discussion
+ */
+ const print = async (id) => {
+  
+  $q.loading.show({
+    spinner: QSpinnerPuff,
+    spinnerColor: 'white',
+    spinnerSize: 25,
+    backgroundColor: 'dark'
+  })
+  
+  try {
+    const res = await server.get(`api/discussion/report/${id}`, {
+      responseType: 'arraybuffer',
+      headers: {
+        'Accept': 'application/pdf'
+      }
+    })
+    const blob = new Blob([res.data], {type: 'application/pdf'});
+    const pdfurl = window.URL.createObjectURL(blob)+"#view=FitW";
+    file.value = pdfurl
+    reportDialog.value = true
+    $q.loading.hide()
+  } catch (error) {
+    $q.loading.hide()
+  }
+}
 
 onMounted(() => {
   /**

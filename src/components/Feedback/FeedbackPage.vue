@@ -267,14 +267,18 @@ const getAllFeedback = async () => {
     tableLoading.value = false
     innerLoading.value = false
   } catch (error) {
-
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
+    tableLoading.value = false
+    innerLoading.value = false
   }
 }
 /**
  * view detail
  */
 const detail = (id) => {
-  navStore.feedbackId = id
+  navStore.feedbackID = id
   navStore.currentPage = 'FeedbackDetailPage'
 }
 
@@ -348,19 +352,24 @@ const receiveFeedback = async () => {
     getAllFeedbackList()
     
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: res.data.msg,
-      toast: true,
-      position: 'bottom-end',
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    })
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: res.data.msg,
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+    }
+    
   }
 }
 /**
@@ -382,7 +391,10 @@ const receiveFeedback = async () => {
      */
     tableLoading.value = false
   } catch (error) {
-
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
+    tableLoading.value = false
   }
 }
 // search data
@@ -393,6 +405,9 @@ const searchList = debounce(async (val) => {
     lists.value = res.data
     tableLoading.value = false
   } catch (error) {
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     tableLoading.value = false
   }
 })

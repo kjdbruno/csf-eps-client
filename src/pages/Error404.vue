@@ -24,26 +24,19 @@
 import { ref, reactive,watch } from 'vue'
 import { useQuasar, QSpinnerPuff } from 'quasar'
 import { useRouter } from 'vue-router'
+import { useUserStore } from 'src/store/user-store';
+import { useAuthStore } from 'src/store/auth-store';
+import { useNavStore } from 'src/store/nav-store'
+
 import Swal from 'sweetalert2'
 
-const logout = () => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: `Sign Out. You won't be able to revert this!`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#224488',
-    cancelButtonColor: '#224488',
-    confirmButtonText: 'Yes!'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      createLogout()
-    } else {
-      id.value = ''
-    }
-  })
-}
-const createLogout = async () => {
+const $q = useQuasar()
+const userStore = useUserStore()
+const authStore = useAuthStore()
+const navStore = useNavStore()
+const router = useRouter()
+
+const logout = async () => {
   $q.loading.show({
     spinner: QSpinnerPuff,
     spinnerColor: 'white',
@@ -53,6 +46,8 @@ const createLogout = async () => {
   try {
     await authStore.logout()
     authStore.clearUser()
+    userStore.clearUser()
+    navStore.currentPage = 'WelcomePage'
     router.push('/')
     $q.loading.hide()
   } catch (error) {

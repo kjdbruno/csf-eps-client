@@ -130,6 +130,15 @@
               </q-item>
             </q-list>
           </div>
+          <q-select emit-value map-options outlined :color="$q.dark.isActive ? 'white' : 'primary'" v-model="roleID" stack-label use-input input-debounce="0" label="Choose Role..." :options="preferenceStore.roles" @filter="filterRole" behavior="menu" class="q-ma-xs" :error-message="errors.roleID.msg" :error="errors.roleID.type">
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                No results
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
           <q-input v-model="name" outlined :color="$q.dark.isActive ? 'white' : 'primary'" type="text" label="Name" stack-label :error-message="errors.name.msg" :error="errors.name.type" class="q-ma-xs" />
           <q-input v-model="email" outlined :color="$q.dark.isActive ? 'white' : 'primary'" type="text" label="E-mail" stack-label :error-message="errors.email.msg" :error="errors.email.type" class="q-ma-xs" />
           <q-input outlined :color="$q.dark.isActive ? 'white' : 'primary'" v-model="password" :type="showPwd ? 'text' : 'password'" label="Password" stack-label class="q-ma-xs" :error-message="errors.password.msg" :error="errors.password.type"/>
@@ -258,15 +267,6 @@
         </q-card-section>
         <q-card-section>
           <q-input v-model="employeeID" outlined :color="$q.dark.isActive ? 'white' : 'primary'" type="text" label="Employee ID" stack-label :error-message="errors.employeeID.msg" :error="errors.employeeID.type" class="q-ma-xs" />
-          <q-select emit-value map-options outlined :color="$q.dark.isActive ? 'white' : 'primary'" v-model="roleID" stack-label use-input input-debounce="0" label="Choose Role..." :options="preferenceStore.roles" @filter="filterRole" behavior="menu" class="q-ma-xs" :error-message="errors.roleID.msg" :error="errors.roleID.type">
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                No results
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
           <q-select emit-value map-options outlined :color="$q.dark.isActive ? 'white' : 'primary'" v-model="officeID" stack-label use-input input-debounce="0" label="Choose Office..." :options="preferenceStore.offices" @filter="filterOffice" behavior="menu" class="q-ma-xs" :error-message="errors.officeID.msg" :error="errors.officeID.type">
             <template v-slot:no-option>
               <q-item>
@@ -415,6 +415,15 @@ const isValidEmail = (val) => {
 
 const accountValidation = () => {
   let isError = false
+  // role
+  if (roleID.value.length < 1) {
+    errors.roleID.msg = 'Please enter your role'
+    errors.roleID.type = true
+    isError = true
+  } else {
+    errors.roleID.msg = null
+    errors.roleID.type = null
+  }
   //name
   if (name.value.length < 1) {
     errors.name.msg = 'Please enter your name'
@@ -536,15 +545,6 @@ const updateValidation = () => {
 
 const verificationValidation = () => {
   let isError = false
-  // role
-  if (roleID.value.length < 1) {
-    errors.roleID.msg = 'Please enter your role'
-    errors.roleID.type = true
-    isError = true
-  } else {
-    errors.roleID.msg = null
-    errors.roleID.type = null
-  }
   // office
   if (officeID.value.length < 1) {
     errors.officeID.msg = 'Please enter your office'
@@ -625,6 +625,7 @@ const resetValidation = () => {
  */
 const newPreference = () => {
   newDialog.value = true
+  roleID.value = ''
   name.value = ''
   email.value = ''
   password.value = ''
@@ -655,6 +656,7 @@ const createPreference = async () => {
      * call to save
      */
     const res = await server.post(`api/account`, {
+      roleID: roleID.value,
       name: name.value,
       email: email.value,
       password: password.value,
@@ -684,6 +686,7 @@ const createPreference = async () => {
     /**
      * clear form
      */
+    roleID.value = ''
     name.value = ''
     email.value = ''
     password.value = ''
@@ -697,15 +700,13 @@ const createPreference = async () => {
      newDialog.value = false
 
   } catch (error) {
-    /**
-     * display error
-     */
-    err.value = error.response.data.errors
-    hasError.value = true
-    /**
-     * disable inner loading
-     */
-     innerLoading.value = false
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      err.value = error.response.data.errors
+      hasError.value = true
+    }
+    innerLoading.value = false
   }
 
 }
@@ -808,15 +809,13 @@ const updatePreference = async () => {
     modifyDialog.value = false
 
   } catch (error) {
-    /**
-     * display error
-     */
-    err.value = error.response.data.errors
-    hasError.value = true
-    /**
-     * disable inner loading
-     */
-     innerLoading.value = false
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      err.value = error.response.data.errors
+      hasError.value = true
+    }
+    innerLoading.value = false
   }
 }
 
@@ -889,9 +888,9 @@ const createDisable = async () => {
      */
     id.value = ''
   } catch (error) {
-    /**
-     * disable loading
-     */
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     $q.loading.hide()
   }
 }
@@ -965,9 +964,9 @@ const createEnable = async () => {
      */
     id.value = ''
   } catch (error) {
-    /**
-     * disable loading
-     */
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     $q.loading.hide()
   }
 }
@@ -1046,11 +1045,13 @@ const verifyPreference = async () => {
     verifyDialog.value = false
 
   } catch (error) {
-    /**
-     * display error
-     */
-    err.value = error.response.data.errors
-    hasError.value = true
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      err.value = error.response.data.errors
+      hasError.value = true
+    }
+    
     /**
      * disable inner loading
      */
@@ -1125,15 +1126,14 @@ const resetPasswordPreference = async () => {
     resetDialog.value = false
 
   } catch (error) {
-    /**
-     * display error
-     */
-    err.value = error.response.data.errors
-    hasError.value = true
-    /**
-     * disable inner loading
-     */
-     innerLoading.value = false
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    } else {
+      err.value = error.response.data.errors
+      hasError.value = true
+    }
+
+    innerLoading.value = false
   }
 }
 
@@ -1149,7 +1149,7 @@ const getAllPreference = async () => {
   } catch (error) {
     tableLoading.value = false
     if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
-      authStore.auth = true
+      authStore.notAuthenticated = true
     }
   }
 }
@@ -1165,6 +1165,9 @@ const searchList = debounce(async (val) => {
     lists.value = res.data
     tableLoading.value = false
   } catch (error) {
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.notAuthenticated = true
+    }
     tableLoading.value = false
   }
 })

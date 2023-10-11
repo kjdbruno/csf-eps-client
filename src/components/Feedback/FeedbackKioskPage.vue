@@ -37,6 +37,12 @@
             <template v-slot:body-cell-name="props">
               <q-td :props="props">
                 <q-item class="q-pa-none" style="max-width: 300px">
+                  <q-item-section avatar class="q-pa-none">
+                    <q-avatar>
+                      <img v-if="props.row.photo" :src="props.row.photo">
+                      <img v-else src="~assets/account.png">
+                    </q-avatar>
+                  </q-item-section>
                   <q-item-section>
                     <q-item-label class="text-uppercase">{{ props.row.name }}</q-item-label>
                     <q-item-label caption>{{ props.row.office }}&nbsp;-&nbsp;{{ props.row.position }}</q-item-label>
@@ -94,6 +100,9 @@
                 <q-btn v-if="props.row.isActive==true" unelevated size="sm" round :color="$q.dark.isActive ? 'grey-9' : 'grey-2'" text-color="grey" icon="more_vert">
                   <q-menu cover auto-close>
                     <q-list>
+                      <q-item dense clickable @click="viewPreference(props.row.id)">
+                        <q-item-section>Details</q-item-section>
+                      </q-item>
                       <q-item dense clickable @click="modifyPreference(props.row)">
                         <q-item-section>Modify</q-item-section>
                       </q-item>
@@ -149,7 +158,24 @@
               </template>
             </q-select>
             <q-input autogrow stack-label outlined v-model="description" :color="$q.dark.isActive ? 'white' : 'primary'" label="Description..." class="q-ma-xs" :error-message="errors.description.msg" :error="errors.description.type" />
-        </q-card-section>
+            <input type="file" @change="onPhotoChange"  ref="file" style="display: none" />
+            <q-btn v-ripple v-if="!photo" :color="$q.dark.isActive ? 'grey-9' : 'primary'" text-color="white" unelevated label="Upload photo" class="q-ma-xs" size="sm" @click="$refs.file.click()" />
+            <div v-if="photo" class="q-ma-xs">
+              <q-list bordered>
+                <q-item>
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img :src="photo">
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>Photo</q-item-section>
+                  <q-item-section side>
+                    <q-btn round unelevated size="sm" icon="delete" @click="removePhoto" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </div>
+          </q-card-section>
         <q-separator />
         <q-card-actions align="right" class="q-pt-md q-pb-md">
           <q-btn v-close-popup size="md" :color="$q.dark.isActive ? 'grey-9' : 'primary'" text-color="white" unelevated label="close" class="btn-form text-capitalize"/>
@@ -171,11 +197,15 @@ import { useQuasar, QSpinnerPuff, debounce, is } from 'quasar'
 import { server } from 'src/boot/axios'
 import { useAuthStore } from 'src/store/auth-store'
 import { usePreferenceStore } from 'src/store/preference-store'
+import { useNavStore } from 'src/store/nav-store'
+import { useFeedbackStore } from 'src/store/feedback-store'
 import Swal from 'sweetalert2'
 
 const $q = useQuasar()
 const authStore = useAuthStore()
 const preferenceStore = usePreferenceStore()
+const navStore = useNavStore()
+const feedbackStore = useFeedbackStore()
 
 const err = ref([])
 const hasError = ref(false)
@@ -188,6 +218,7 @@ const name = ref('')
 const officeID = ref('')
 const positionID = ref('')
 const description = ref('')
+const photo = ref('')
 
 const filter = ref('')
 const preferenceDialog = ref(false)
@@ -197,10 +228,10 @@ const columns = ref([
   {name: 'active', label: '', field: '', sortable: false, align: 'left'},
   {name: 'name', label: 'Name', field: '', sortable: true, align: 'left'},
   {name: 'description', label: 'Description', field: '', sortable: true, align: 'left'},
-  {name: 'phy', label: 'Phy. R.', field: '', sortable: true, align: 'center'},
-  {name: 'ser', label: 'Ser. R.', field: '', sortable: true, align: 'center'},
-  {name: 'per', label: 'Per. R.', field: '', sortable: true, align: 'center'},
-  {name: 'ovr', label: 'Ovr. R.', field: '', sortable: true, align: 'center'},
+  {name: 'phy', label: 'Physical Rating', field: '', sortable: true, align: 'left'},
+  {name: 'ser', label: 'Service Rating', field: '', sortable: true, align: 'left'},
+  {name: 'per', label: 'Personnel Rating', field: '', sortable: true, align: 'left'},
+  {name: 'ovr', label: 'Overall Rating', field: '', sortable: true, align: 'left'},
   {name: 'action', label: '', field: 'Action', sortable: false, align: 'right'}
 ])
 
@@ -208,7 +239,7 @@ const errors = reactive({
   name: {msg: null, type: null},
   officeID: {msg: null, type: null},
   positionID: {msg: null, type: null},
-  description: {msg: null, type: null}
+  description: {msg: null, type: null},
 })
 
 const validation = () => {
@@ -265,6 +296,7 @@ const newPreference = () => {
   officeID.value = ''
   positionID.value = ''
   description.value = ''
+  photo.value = ''
 }
 
 /**
@@ -293,7 +325,8 @@ const createPreference = async () => {
       name: name.value,
       officeID: officeID.value,
       positionID: positionID.value,
-      description: description.value
+      description: description.value,
+      photo: photo.value
     })
     /**
      * response message
@@ -322,6 +355,7 @@ const createPreference = async () => {
     officeID.value = ''
     positionID.value = ''
     description.value = ''
+    photo.value = ''
     /**
      * disable inner loading
      */
@@ -359,6 +393,7 @@ const modifyPreference = async (data) => {
   officeID.value = data.officeID
   positionID.value = data.positionID
   description.value = data.description
+  photo.value = data.photo
 }
 
 /**
@@ -387,7 +422,8 @@ const updatePreference = async () => {
       name: name.value,
       officeID: officeID.value,
       positionID: positionID.value,
-      description: description.value
+      description: description.value,
+      photo: photo.value
     })
     /**
      * response message
@@ -417,6 +453,7 @@ const updatePreference = async () => {
     officeID.value = ''
     positionID.value = ''
     description.value = ''
+    photo.value = ''
     /**
      * disable inner loading
      */
@@ -595,6 +632,14 @@ const createEnable = async () => {
 }
 
 /**
+ * 
+ */
+const viewPreference = async (id) => {
+  navStore.feedbackID = id
+  navStore.currentPage = 'FeedbackKioskDetailPage'
+}
+
+/**
 * get all preference
 */
 const getAllPreference = async () => {
@@ -609,6 +654,30 @@ const getAllPreference = async () => {
       authStore.isAuthenticated = false
     }
   }
+}
+/**
+ * upload photo
+ */
+ const onPhotoChange = (e) => {
+  let files = e.target.files || e.dataTransfer.files;
+  if (!files.length)
+    return;
+    createPhoto(files[0]);
+}
+const createPhoto = (file) => {
+  let image = new Image();
+  let reader = new FileReader();
+
+  reader.onload = (e) => {
+    photo.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+/**
+ * remove photo
+ */
+const removePhoto = () => {
+  photo.value = ''
 }
 /**
  * filter office

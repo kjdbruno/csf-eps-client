@@ -218,6 +218,7 @@
     </div>
     <q-dialog v-model="reportDialog" full-height full-width>
       <q-card>
+        <q-btn icon="close" class="fixed bg-white" round dense v-close-popup style="top: 25px; right: 10px; transform: translateY(-50%); z-index: 999;" />
         <q-card-section class="q-pa-none">
           <div v-if="file" class="myIframe"> 
             <iframe :src="file" height="100%" width="100%"></iframe>
@@ -321,7 +322,7 @@ const getDiscussion = async () => {
    */
   userLoading.value = true
   try {
-    const res = await server.get(`api/discussion/detail/${navStore.discussionId}`)
+    const res = await server.get(`api/discussion/detail/${navStore.discussionID}`)
     detail.value = res.data
     userLoading.value = false
   } catch (error) {
@@ -338,7 +339,7 @@ const getThread = async () => {
    */
   threadLoading.value = true
   try {
-    const res = await server.get(`api/discussion/thread/${navStore.discussionId}`)
+    const res = await server.get(`api/discussion/thread/${navStore.discussionID}`)
     thread.value = res.data
     threadLoading.value = false
   } catch (error) {
@@ -355,7 +356,7 @@ const getThread = async () => {
    */
   answerLoading.value = true
   try {
-    const res = await server.get(`api/discussion/answer/${navStore.discussionId}`)
+    const res = await server.get(`api/discussion/answer/${navStore.discussionID}`)
     answer.value = res.data
     //
     const aOption = []
@@ -714,7 +715,7 @@ const generateDiscussion = async () => {
   rLoading.value = true
   
   try {
-    const res = await server.get(`api/report/discussion/detail?id=${navStore.discussionId}`, {
+    const res = await server.get(`api/discussion/report/${navStore.discussionId}`, {
       responseType: 'arraybuffer',
       headers: {
         'Accept': 'application/pdf'

@@ -25,22 +25,24 @@
               <q-btn @click="generateKiosk" size="md" :color="$q.dark.isActive ? 'grey-9' : 'primary'" text-color="white" unelevated label="kiosk" class="q-mr-xs q-mt-xs"/>
             </div>
           </div>
-          <div class="col">
-            <div v-if="file" class="myIframe"> 
-              <iframe :src="file" height="100%" width="100%"></iframe>
-            </div>
-          </div>
         </div>
       </q-card-section>
-      <q-inner-loading :showing="innerLoading">
-        <q-spinner-puff size="25px" color="grey" />
-      </q-inner-loading>
     </q-card>
+    <q-dialog v-model="reportDialog" full-height full-width>
+      <q-card>
+        <q-btn icon="close" class="fixed bg-white" round dense v-close-popup style="top: 25px; right: 10px; transform: translateY(-50%); z-index: 999;" />
+        <q-card-section class="q-pa-none">
+          <div v-if="file" class="myIframe"> 
+            <iframe :src="file" height="100%" width="100%"></iframe>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import { useQuasar, QSpinnerIos, debounce, is } from 'quasar'
+import { useQuasar, QSpinnerPuff, debounce, is } from 'quasar'
 import { server } from 'src/boot/axios'
 import moment from 'moment'
 
@@ -48,17 +50,20 @@ const $q = useQuasar()
 
 const date = ref('')
 const file = ref('')
-const innerLoading = ref(false)
+const reportDialog = ref(false)
 
 /**
  * summary
  */
 const generateSummary = async () => {
-  /**
-   * enable loading
-   */
-  innerLoading.value = true
-  //declare date
+  
+  $q.loading.show({
+    spinner: QSpinnerPuff,
+    spinnerColor: 'white',
+    spinnerSize: 25,
+    backgroundColor: '#000'
+  })
+
   const dt = date.value
   const from = moment(dt.from).format("YYYY-MM-DD")
   const to = moment(dt.to).format("YYYY-MM-DD")
@@ -72,9 +77,10 @@ const generateSummary = async () => {
     const blob = new Blob([res.data], {type: 'application/pdf'});
     const pdfurl = window.URL.createObjectURL(blob)+"#view=FitW";
     file.value = pdfurl
-    innerLoading.value = false
+    reportDialog.value = true
+    $q.loading.hide()
   } catch (error) {
-
+    $q.loading.hide()
   }
 }
 
@@ -82,11 +88,14 @@ const generateSummary = async () => {
  * category
  */
 const generateCategory = async () => {
-  /**
-   * enable loading
-   */
-  innerLoading.value = true
-  //declare date
+  
+  $q.loading.show({
+    spinner: QSpinnerPuff,
+    spinnerColor: 'white',
+    spinnerSize: 25,
+    backgroundColor: '#000'
+  })
+
   const dt = date.value
   const from = moment(dt.from).format("YYYY-MM-DD")
   const to = moment(dt.to).format("YYYY-MM-DD")
@@ -100,9 +109,10 @@ const generateCategory = async () => {
     const blob = new Blob([res.data], {type: 'application/pdf'});
     const pdfurl = window.URL.createObjectURL(blob)+"#view=FitW";
     file.value = pdfurl
-    innerLoading.value = false
+    reportDialog.value = true
+    $q.loading.hide()
   } catch (error) {
-
+    $q.loading.hide()
   }
 }
 
@@ -110,11 +120,14 @@ const generateCategory = async () => {
  * status
  */
 const generateStatus = async () => {
-  /**
-   * enable loading
-   */
-  innerLoading.value = true
-  //declare date
+  
+  $q.loading.show({
+    spinner: QSpinnerPuff,
+    spinnerColor: 'white',
+    spinnerSize: 25,
+    backgroundColor: '#000'
+  })
+
   const dt = date.value
   const from = moment(dt.from).format("YYYY-MM-DD")
   const to = moment(dt.to).format("YYYY-MM-DD")
@@ -128,9 +141,10 @@ const generateStatus = async () => {
     const blob = new Blob([res.data], {type: 'application/pdf'});
     const pdfurl = window.URL.createObjectURL(blob)+"#view=FitW";
     file.value = pdfurl
-    innerLoading.value = false
+    reportDialog.value = true
+    $q.loading.hide()
   } catch (error) {
-
+    $q.loading.hide()
   }
 }
 
@@ -138,11 +152,14 @@ const generateStatus = async () => {
  * office
  */
 const generateOffice = async () => {
-  /**
-   * enable loading
-   */
-  innerLoading.value = true
-  //declare date
+  
+  $q.loading.show({
+    spinner: QSpinnerPuff,
+    spinnerColor: 'white',
+    spinnerSize: 25,
+    backgroundColor: '#000'
+  })
+
   const dt = date.value
   const from = moment(dt.from).format("YYYY-MM-DD")
   const to = moment(dt.to).format("YYYY-MM-DD")
@@ -156,9 +173,10 @@ const generateOffice = async () => {
     const blob = new Blob([res.data], {type: 'application/pdf'});
     const pdfurl = window.URL.createObjectURL(blob)+"#view=FitW";
     file.value = pdfurl
-    innerLoading.value = false
+    reportDialog.value = true
+    $q.loading.hide()
   } catch (error) {
-
+    $q.loading.hide()
   }
 }
 
@@ -166,11 +184,14 @@ const generateOffice = async () => {
  * kiosk
  */
 const generateKiosk = async () => {
-  /**
-   * enable loading
-   */
-   innerLoading.value = true
-  //declare date
+  
+  $q.loading.show({
+    spinner: QSpinnerPuff,
+    spinnerColor: 'white',
+    spinnerSize: 25,
+    backgroundColor: '#000'
+  })
+
   const dt = date.value
   const from = moment(dt.from).format("YYYY-MM-DD")
   const to = moment(dt.to).format("YYYY-MM-DD")
@@ -184,9 +205,10 @@ const generateKiosk = async () => {
     const blob = new Blob([res.data], {type: 'application/pdf'});
     const pdfurl = window.URL.createObjectURL(blob)+"#view=FitW";
     file.value = pdfurl
-    innerLoading.value = false
+    reportDialog.value = true
+    $q.loading.hide()
   } catch (error) {
-
+    $q.loading.hide()
   }
 }
 

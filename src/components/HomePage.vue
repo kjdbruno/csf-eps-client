@@ -370,7 +370,7 @@ const getDashboard = async () => {
    */
   innerLoading.value = true
   try {
-    const res = await server.get(`api/dashboard`)
+    const res = await server.get(`api/overview/${authStore.id}`)
     const dt = res.data
     //
     totalRegistrant.value = res.data.totalRegistrant
@@ -541,7 +541,7 @@ const getDashboard = async () => {
   } catch (error) {
     innerLoading.value = false
     if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
-      authStore.auth = true
+      authStore.notAuthenticated = true
     }
   }
 }

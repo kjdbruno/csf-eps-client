@@ -239,6 +239,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { onMounted } from 'vue-demi'
+import { useAuthStore } from 'src/store/auth-store'
 import { useUserStore } from '../store/user-store'
 import { usePreferenceStore } from 'src/store/preference-store'
 import { useNavStore } from 'src/store/nav-store'
@@ -269,6 +270,7 @@ const userStore = useUserStore()
 const router = useRouter()
 const preferenceStore = usePreferenceStore()
 const navStore = useNavStore()
+const authStore = useAuthStore()
 const $q = useQuasar()
 
 const avatar = ref('')
@@ -402,6 +404,8 @@ const logout = async () => {
   try {
     await userStore.logout()
     userStore.clearUser()
+    authStore.clearUser()
+    navStore.clearNav()
     router.push('/')
     $q.loading.hide()
   } catch (error) {

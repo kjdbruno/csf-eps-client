@@ -1,7 +1,7 @@
 <template>
     <div>
           <!--mobile-->
-         <q-page class="mobile">
+         <q-page class="mobile-only">
              <div class="h-wrapper">
                  <q-img src="~assets/logo/logo_blue.png" class="logo" />
              </div>
@@ -18,7 +18,7 @@
              </div>
          </q-page>
          <!--desktop-->
-         <q-page class="desktop">
+         <q-page class="desktop-only">
              <q-card class="card fixed-center">
                  <q-card-section class="text-center q-pt-xl">
                      <q-img src="~assets/logo/logo_blue.png" class="logo q-mt-xl q-mb-xl" />
@@ -32,6 +32,9 @@
              </q-card>
              <div class="overlay"></div>
          </q-page>
+
+         <q-btn v-if="$q.platform.is.desktop" unelevated round color="dark" icon="verified_user" class="absolute" size="md" style="top: 35px; left: 15px; transform: translateY(-50%); z-index: 5;" @click="navStore.currentPage = 'LoginPage'" />
+
     </div>
  </template>
  

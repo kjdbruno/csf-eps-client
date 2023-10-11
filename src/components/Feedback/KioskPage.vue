@@ -3,7 +3,18 @@
         
       <q-stepper v-model="step" ref="stepper" done-color="green" active-color="secondary" :inactive-color="$q.dark.isActive ? 'grey-7' : 'grey'" animated class="no-shadow" transition-prev="jump-left" transition-next="jump-right">
             
-        <q-step :name="1" title="OFFICE" :done="step > 1" >
+        <q-step :name="1" title="CLIENT" :done="step > 1" >
+          <div class="text-center">
+            <div class="text-h4 text-uppercase q-mb-lg" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">who are you?</div>
+            <div>
+              <q-input class="q-mt-xs" label="Name" v-model="name" outlined :color="$q.dark.isActive ? 'white' : 'primary'" />
+              <q-input class="q-mt-xs" label="Contact Number" v-model="number" outlined :color="$q.dark.isActive ? 'white' : 'primary'" />
+              <q-input class="q-mt-xs" label="E-mail" v-model="email" outlined :color="$q.dark.isActive ? 'white' : 'primary'" :error-message="errors.email.msg" :error="errors.email.type" />
+            </div>
+          </div>
+        </q-step>
+
+        <q-step :name="2" title="OFFICE" :done="step > 2" >
           <div class="text-center">
             <div class="text-h4 text-uppercase q-mb-lg" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">what office and who will you rate?</div>
             <div>
@@ -14,13 +25,6 @@
                 </q-item>
                 </template>
               </q-select>
-              <!-- <q-select :color="$q.dark.isActive ? 'white' : 'primary'" emit-value map-options outlined v-model="personnelID" use-input input-debounce="0" label="Choose Personnel..." :options="preferenceStore.personnels" @filter="filterPersonnel" behavior="menu" class="full-width q-mt-sm" :error-message="errors.personnelID.msg" :error="errors.personnelID.type">
-                <template v-slot:no-option>
-                  <q-item>
-                    <q-item-section class="text-grey"> No results</q-item-section>
-                  </q-item>
-                </template>
-              </q-select> -->
               <q-select :color="$q.dark.isActive ? 'white' : 'primary'" outlined v-model="personnelID" :options="preferenceStore.personnels" label="Choose Personnel..."  use-input input-debounce="0" @filter="filterPersonnel" :error-message="errors.personnelID.msg" :error="errors.personnelID.type" class="full-width q-mt-xs">
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
@@ -36,7 +40,7 @@
           </div>
         </q-step>
 
-        <q-step :name="2" title="PHYSICAL" :done="step > 2" >
+        <q-step :name="3" title="PHYSICAL" :done="step > 3" >
           <div class="text-center">
             <div class="text-h4 text-uppercase q-mb-lg" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">the work environment is clean and orderly</div>
             <div>
@@ -45,7 +49,7 @@
           </div>
         </q-step>
 
-        <q-step :name="3" title="SERVICES" :done="step > 3" >
+        <q-step :name="4" title="SERVICES" :done="step > 4" >
           <div class="text-center">
             <div class="text-h4 text-uppercase q-mb-lg" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">your concern is addressed promply and appropriately</div>
             <div>
@@ -54,7 +58,7 @@
           </div>
         </q-step>
 
-        <q-step :name="4" title="PERSONNEL" :done="step > 4" >
+        <q-step :name="5" title="PERSONNEL" :done="step > 5" >
           <div class="text-center">
             <div class="text-h4 text-uppercase q-mb-lg" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">the employee was courteous and accomodating</div>
             <div>
@@ -63,7 +67,7 @@
           </div>
         </q-step>
 
-        <q-step :name="5" title="OVERALL RATING" :done="step > 5" >
+        <q-step :name="6" title="OVERALL RATING" :done="step > 6" >
           <div class="text-center">
             <div class="text-h4 text-uppercase q-mb-lg" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">how satisfied are you with the quality of service provided?</div>
             <div>
@@ -72,7 +76,7 @@
           </div>
         </q-step>
 
-        <q-step :name="6" title="SUGGESTIONS" :done="step > 6" >
+        <q-step :name="7" title="SUGGESTIONS" :done="step > 7" >
           <div class="text-center">
             <div class="text-h4 text-uppercase" :class="$q.dark.isActive ? 'text-white' : 'text-grey-9'">suggestions/comments/commendations</div>
             <q-input class="q-mt-md" v-model="suggestion" outlined type="textarea" :color="$q.dark.isActive ? 'white' : 'primary'" />
@@ -82,7 +86,7 @@
         <template v-slot:navigation>
           <q-stepper-navigation class="q-mt-lg text-center">
             <q-btn size="md" unelevated v-if="step > 1" :color="$q.dark.isActive ? 'grey-9' : 'primary'" text-color="white" @click="$refs.stepper.previous()" label="Back" class="q-mr-sm" />
-            <q-btn size="md" unelevated @click="step === 6 ? createRating() : $refs.stepper.next()" :color="$q.dark.isActive ? 'grey-9' : 'primary'" text-color="white" :label="step === 6 ? 'Finish' : 'Continue'" :loading="innerLoading">
+            <q-btn size="md" unelevated @click="step === 7 ? createRating() : $refs.stepper.next()" :color="$q.dark.isActive ? 'grey-9' : 'primary'" text-color="white" :label="step === 7 ? 'Finish' : 'Continue'" :loading="innerLoading">
               <template v-slot:loading>
                 <q-spinner-puff />
               </template>
@@ -118,6 +122,9 @@ import Swal from 'sweetalert2'
 const $q = useQuasar()
 const preferenceStore = usePreferenceStore()
 
+const name = ref('')
+const number = ref('')
+const email = ref('')
 const officeID = ref('')
 const personnelID = ref('')
 const phyRadio = ref(0)
@@ -151,8 +158,14 @@ const hasError = ref(false)
 
 const errors = reactive({
   officeID: { msg: null, type: null },
-  personnelID: {msg: null, text: null}
+  personnelID: {msg: null, text: null},
+  email: {msg: null, type: null},
 })
+
+const isValidEmail = (val) => {
+  const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/
+  return !emailPattern.test(val)
+}
 
 const validation = () => {
   let isError = false
@@ -173,6 +186,15 @@ const validation = () => {
   } else {
     errors.personnelID.msg = null
     errors.personnelID.type = null
+  }
+  //email
+  if (email.value.length > 0 && isValidEmail(email.value)) {
+    errors.email.msg = 'The email you entered is not valid'
+    errors.email.type = true
+    isError = true
+  } else {
+    errors.email.msg = null
+    errors.email.type = null
   }
 
   return isError
@@ -231,6 +253,9 @@ const createRating = async () => {
 
   try {
     const res = await server.post('api/feedback/entry/kiosk', {
+      name: name.value,
+      number: number.value,
+      email: email.value,
       officeID: officeID.value,
       personnelID: personnel.id,
       phyRating: phyRadio.value,
@@ -253,6 +278,9 @@ const createRating = async () => {
       }
     })
     $q.loading.hide()
+    name.value = ''
+    number.value = ''
+    email.value = ''
     officeID.value = ''
     personnelID.value = ''
     phyRadio.value = 0

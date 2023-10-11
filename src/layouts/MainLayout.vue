@@ -65,12 +65,6 @@
       <div class="full-height drawer">
         <div class="full-height wrapper" :class="$q.dark.isActive ? 'drawer-dark' : 'drawer-light'">
           <div style="height: calc(100% - 117px); padding:10px;">
-            <!-- <q-toolbar class="text-center">
-              <q-avatar>
-                <img v-if="!$q.dark.isActive" src="~assets/ask_light.png" />
-                <img v-if="$q.dark.isActive" src="~assets/ask_dark.png" />
-              </q-avatar>
-            </q-toolbar> -->
             <div class="text-center q-pt-md q-pb-md">
               <q-avatar>
                 <img :src="authStore.avatar" style="border: 1px solid #fff;"/>
@@ -124,7 +118,7 @@
                       </q-list>
                     </q-menu>
                   </q-item>
-                  <q-item class="q-ma-sm navigation-item" clickable v-ripple :class="navStore.currentPage == 'FeedbackOverviewPage' ? 'active' : (navStore.currentPage == 'FeedbackDetailPage' ? 'active' : (navStore.currentPage == 'FeedbackEntryPage' ? 'active' : (navStore.currentPage == 'FeedbackKioskPage' ? 'active' : null)))">
+                  <q-item class="q-ma-sm navigation-item" clickable v-ripple :class="navStore.currentPage == 'FeedbackOverviewPage' ? 'active' : (navStore.currentPage == 'FeedbackDetailPage' ? 'active' : (navStore.currentPage == 'FeedbackEntryPage' ? 'active' : (navStore.currentPage == 'FeedbackKioskPage' ? 'active' : (navStore.currentPage == 'FeedbackKioskDetailPage' ? 'active' : null))))">
                     <q-item-section avatar>
                       <q-icon class="text-dark" size="sm">
                         <img src="~assets/tabs/feedback.png" />
@@ -153,12 +147,6 @@
                     </q-item-section>
                     <q-item-section>Discussion & Poll</q-item-section>
                   </q-item>
-                  <!-- <q-item exact class="q-ma-sm navigation-item" clickable v-ripple :class="navStore.currentPage == 'PollPage' ? 'active' : (navStore.currentPage == 'PollDetailPage' ? 'active' : null)" @click="toPoll">
-                    <q-item-section avatar>
-                      <q-icon name="ballot" />
-                    </q-item-section>
-                    <q-item-section>Poll</q-item-section>
-                  </q-item> -->
                   <q-item v-if="authStore.isAdmin || authStore.isSup || authStore.isMgmt" exact class="q-ma-sm navigation-item" clickable v-ripple :class="navStore.currentPage == 'SummaryReportPage' ? 'active' : (navStore.currentPage == 'FeedbackReportPage' ? 'active' : (navStore.currentPage == 'DiscussionReportPage' ? 'active' : (navStore.currentPage == 'PollReportPage' ? 'active' : null)))">
                     <q-item-section avatar>
                       <q-icon class="text-dark" size="sm">
@@ -177,26 +165,9 @@
                         <q-item dense clickable @click="toDiscussionReport" v-close-popup>
                           <q-item-section>Discussion & Poll</q-item-section>
                         </q-item>
-                        <!-- <q-item dense clickable @click="toPollReport" v-close-popup>
-                          <q-item-section>Poll</q-item-section>
-                        </q-item> -->
                       </q-list>
                     </q-menu>
                   </q-item>
-                  <!-- <q-separator v-if="authStore.isAdmin || authStore.isSup || authStore.isMgmt" :color="$q.dark.isActive ? 'grey-8' : 'grey-5'" />
-                  <q-item v-if="authStore.isAdmin || authStore.isSup || authStore.isMgmt" exact class="q-ma-sm navigation-item" :class="navStore.currentPage == 'CitizenCharterPage' ? 'active' : null" clickable v-ripple @click="toCitizen">
-                    <q-item-section avatar>
-                      <q-icon name="attachment" />
-                    </q-item-section>
-                    <q-item-section>Citizen's Charter</q-item-section>
-                  </q-item> -->
-                  <!-- <q-separator v-if="authStore.isAdmin || authStore.isSup || authStore.isMgmt" :color="$q.dark.isActive ? 'grey-8' : 'grey-5'" />
-                  <q-item v-if="authStore.isAdmin || authStore.isSup || authStore.isMgmt" exact class="q-ma-sm navigation-item" :class="navStore.currentPage == 'AnnouncementPage' ? 'active' : null" clickable v-ripple @click="toAnnouncement">
-                    <q-item-section avatar>
-                      <q-icon name="campaign" />
-                    </q-item-section>
-                    <q-item-section>Announcement</q-item-section>
-                  </q-item> -->
                 </q-list>
             </q-scroll-area>
           </div>
@@ -211,7 +182,7 @@
       </q-page>
     </q-page-container>
     <!--Account validation Dialog-->
-    <q-dialog v-model="accountDialog" position="top" persistent>
+    <q-dialog v-model="authStore.isVerified" position="top" persistent>
       <q-card class="bg-red-10 text-white">
         <q-card-section class="">
           <div class="text-h5 text-weight-bold">Your account is not verified!</div>
@@ -221,7 +192,7 @@
       </q-card>
     </q-dialog>
     <!--Auth Dialog-->
-    <q-dialog v-model="authStore.auth" position="top" persistent>
+    <q-dialog v-model="authStore.notAuthenticated" position="top" persistent>
       <q-card class="bg-red-10 text-white">
         <q-card-section class="">
           <div class="text-h5 text-weight-bold">Account is not authenticated!</div>
@@ -238,6 +209,7 @@ import { ref, reactive,watch } from 'vue'
 import { onMounted } from 'vue-demi'
 import { useAuthStore } from 'src/store/auth-store';
 import { useNavStore } from 'src/store/nav-store';
+import { useUserStore } from 'src/store/user-store';
 import { usePreferenceStore } from 'src/store/preference-store'
 import { useQuasar, QSpinnerPuff } from 'quasar'
 import { useRouter } from 'vue-router'
@@ -259,6 +231,7 @@ import FeedbackOverviewPage from 'src/components/Feedback/FeedbackPage'
 import FeedbackDetailPage from 'src/components/Feedback/FeedbackDetailPage'
 import FeedbackEntryPage from 'src/components/Feedback/FeedbackEntryPage'
 import FeedbackKioskPage from 'src/components/Feedback/FeedbackKioskPage'
+import FeedbackKioskDetailPage from 'src/components/Feedback/FeedbackKioskDetailPage'
 // Discussion
 import DiscussionPage from 'src/components/Discussion/DiscussionPage'
 import DiscussionDetailPage from 'src/components/Discussion/DiscussionDetailPage'
@@ -279,7 +252,7 @@ const components = {
   HomePage,
   MyAccountPage, ResetPasswordPage,
   YearPreferencePage, OfficePreferencePage, AccountPreferencePage, PositionPreferencePage, CategoryPreferencePage, MessagePreferencePage, OfficeCategoryPreferencePage,
-  FeedbackOverviewPage, FeedbackDetailPage, FeedbackEntryPage, FeedbackKioskPage,
+  FeedbackOverviewPage, FeedbackDetailPage, FeedbackEntryPage, FeedbackKioskPage, FeedbackKioskDetailPage,
   DiscussionPage, DiscussionDetailPage,
   PollPage, PollDetailPage,
   SummaryReportPage, FeedbackReportPage, DiscussionReportPage, PollReportPage,
@@ -290,12 +263,10 @@ const components = {
 const $q = useQuasar()
 const router = useRouter()
 
-const accountDialog = ref(false)
-const authDialog = ref(false)
-
 const authStore = useAuthStore()
 const navStore = useNavStore()
 const preferenceStore = usePreferenceStore()
+const userStore = useUserStore()
 
 const left = ref(false)
 
@@ -371,18 +342,6 @@ const toDiscussionReport = () => {
   navStore.currentPage = 'DiscussionReportPage'
 }
 
-const toPollReport = () => {
-  navStore.currentPage = 'PollReportPage'
-}
-
-const toCitizen = () => {
-  navStore.currentPage = 'CitizenCharterPage'
-}
-
-const toAnnouncement = () => {
-  navStore.currentPage = 'AnnouncementPage'
-}
-
 const logout = () => {
   Swal.fire({
     title: 'Are you sure?',
@@ -410,36 +369,25 @@ const createLogout = async () => {
   try {
     await authStore.logout()
     authStore.clearUser()
-    router.push('/admin')
+    userStore.clearUser()
+    navStore.clearNav()
+    navStore.currentPage = 'LoginPage'
+    router.push('/')
     $q.loading.hide()
   } catch (error) {
+    if (error.response.status == 401 && error.response.data.message == 'Unauthenticated.') {
+      authStore.clearUser()
+      userStore.clearUser()
+      navStore.clearNav()
+      navStore.currentPage = 'LoginPage'
+      router.push('/')
+    }
     console.log(error)
     $q.loading.hide()
   }
 }
 
-// const checkAuth  = async () => {
-//   const auth = await authStore.checkAuth()
-//   authStore.isAuthenticated = auth.data.auth
-//   const authLength = auth.data.user.length
-//   if (authLength < 1) {
-//     accountDialog.value = true
-//   } else {
-//     authStore.setAuth(auth.data.user[0])
-//   }
-//   if (auth.data.auth == false) {
-//     authStore.auth = true
-//   }
-// }
-
 onMounted(() => {
-  /**
-   * Check authenticated user
-   */
-  // checkAuth()
-  /**
-   * get preference -> store/preference-store.js
-   */
   preferenceStore.fetchYear()
   preferenceStore.fetchSex()
   preferenceStore.fetchRole()
@@ -447,8 +395,6 @@ onMounted(() => {
   preferenceStore.fetchOffice()
   preferenceStore.fetchCategory()
 })
-
-// watch(() => authStore.isAuthenticated, authDialog.value = true)
 
 </script>
 

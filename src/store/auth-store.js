@@ -23,6 +23,10 @@ export const useAuthStore = defineStore('auth', {
     isSup: null,
     isMgmt: null,
     isEncoder: null,
+    feedbackID: null,
+    discussionID: null,
+    isVerified: false,
+    notAuthenticated: false
   }),
   getters: {
     getToken: (state) => {
@@ -82,6 +86,18 @@ export const useAuthStore = defineStore('auth', {
     getEncoder: (state) => {
       return state.isEncoder
     },
+    getFeedbackID: (state) => {
+      return state.feedbackID
+    },
+    getDiscussionID: (state) => {
+      return state.discussionID
+    },
+    getIsVerified: (state) => {
+      return state.isVerified
+    },
+    getNotAuthenticated: (state) => {
+      return state.notAuthenticated
+    }
   },
   actions: {
     async getSanctumCookie () {
@@ -153,6 +169,7 @@ export const useAuthStore = defineStore('auth', {
         this.isMgmt = false
         this.isEncoder = true
       }
+      this.isVerified = (payload.vCount <= 0 ? true : false)
     },
 
     clearUser () {
@@ -174,6 +191,10 @@ export const useAuthStore = defineStore('auth', {
       this.isSup = false
       this.isMgmt = false
       this.isEncoder = false
+      this.feedbackID = null
+      this.discussionID = null
+      this.isVerified = false
+      this.notAuthenticated = false
     }
   },
   persist: true

@@ -22,13 +22,13 @@ const routes = [
       { path: '', component: () => import('pages/Home.vue') }
     ],
   },
-  {
-    path: '/admin',
-    component: () => import('layouts/BlankLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/Index.vue') }
-    ]
-  },
+  // {
+  //   path: '/admin',
+  //   component: () => import('layouts/BlankLayout.vue'),
+  //   children: [
+  //     { path: '', component: () => import('pages/Index.vue') }
+  //   ]
+  // },
   {
     path: '/admin/workplace',
     component: () => import('layouts/MainLayout.vue'),

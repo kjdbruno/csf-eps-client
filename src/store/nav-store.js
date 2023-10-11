@@ -2,9 +2,8 @@ import { defineStore } from 'pinia'
 
 export const useNavStore = defineStore('nav', {
   state: () => ({
-    feedbackId: null,
-    discussionId: null,
-    pollId: null,
+    feedbackID: null,
+    discussionID: null,
     currentPage: null,
   }),
   getters: {
@@ -12,10 +11,10 @@ export const useNavStore = defineStore('nav', {
       return state.currentPage
     },
     getFeedback: (state) => {
-      return state.feedbackId
+      return state.feedbackID
     },
     getDiscussion: (state) => {
-      return state.discussionId
+      return state.discussionID
     },
     getPoll: (state) => {
       return state.pollId
@@ -24,6 +23,8 @@ export const useNavStore = defineStore('nav', {
   actions: {
 
     clearNav () {
+      this.feedbackID = null
+      this.discussionID = null
       this.currentPage = null
     }
 
